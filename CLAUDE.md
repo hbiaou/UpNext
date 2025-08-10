@@ -4,51 +4,54 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-UpNext is an AI-first task and note manager that runs entirely on the user's device with no backend or hosting requirements. It's built as a React single-page application with local SQLite storage using Drizzle ORM.
+UpNext is an AI-first task and note manager that runs entirely on the user's device with no backend or hosting requirements. It's built as a Rails 8.0+ Progressive Web App (PWA) with Hotwire for interactions and IndexedDB for client-side storage.
 
 ## Tech Stack
 
-- **Frontend**: React 19 with TypeScript
-- **Build Tool**: Vite
-- **Styling**: TailwindCSS 4.x with custom design system
-- **Routing**: React Router DOM
-- **State Management**: TanStack React Query
-- **Database**: SQLite with Drizzle ORM via better-sqlite3
-- **Icons**: Lucide React
-- **Utilities**: clsx, tailwind-merge
-- **Animation**: tailwindcss-animate
+- **Framework**: Ruby on Rails 8.0+ with Ruby 3.4+
+- **Frontend**: Hotwire (Turbo + Stimulus) for SPA-like interactions
+- **Styling**: TailwindCSS with Rails asset pipeline
+- **Database**: IndexedDB via Dexie.js (client-side storage)
+- **PWA**: Rails PWA gem with service workers and manifest
+- **JavaScript**: ImportMaps for module management
+- **Icons**: Inline SVG icons
+- **Deployment**: Static site generation for GitHub Pages
 
 ## Common Commands
 
 ```bash
 # Development
-npm run dev          # Start development server
+rails server         # Start development server (port 3000)
+bin/dev              # Start with asset watching
 
 # Build
-npm run build        # TypeScript compilation + production build
-npm run preview      # Preview production build
+rails assets:precompile     # Compile assets for production
+rake generate:static_site   # Generate static site for deployment
 
 # Code Quality
-npm run lint         # ESLint with TypeScript support
+rubocop              # Ruby style guide enforcement
+brakeman             # Security vulnerability scanning
 ```
 
 ## Architecture
 
-### Database Layer (`src/lib/db/`)
-- **schema.ts**: Drizzle ORM schema definitions for `tasks` and `notes` tables
-- **index.ts**: Database connection using better-sqlite3 driver
-- **drizzle.config.ts**: Drizzle configuration for schema management
-- Uses SQLite with local file storage (`./local.db`)
+### Database Layer (`app/javascript/database.js`)
+- **IndexedDB**: Client-side database using Dexie.js wrapper
+- **TaskService**: CRUD operations for tasks with completion tracking
+- **NoteService**: CRUD operations for notes with rich content
+- **DataService**: Export/import functionality for backup
+- No server-side database - completely browser-based storage
 
 ### Application Structure
-- **src/main.tsx**: Application entry point
-- **src/App.tsx**: Root component with QueryClient and Router setup
-- **src/pages/**: Page-level components (currently HomePage with task/note cards)
-- **src/lib/**: Shared utilities and database layer
-  - **db/**: Database schema and connection
-  - **utils.ts**: Utility functions
-- **src/styles/globals.css**: Global styles and CSS custom properties
-- **src/vite-env.d.ts**: Vite TypeScript definitions
+- **app/controllers/home_controller.rb**: Main application controller
+- **app/views/home/index.html.erb**: Main application view with Stimulus controllers
+- **app/views/layouts/application.html.erb**: Application layout with PWA configuration
+- **app/javascript/controllers/**: Stimulus controllers for client-side interactions
+  - **tasks_controller.js**: Task management with IndexedDB operations
+  - **notes_controller.js**: Note management with modal views
+- **app/javascript/database.js**: IndexedDB wrapper with Dexie.js
+- **app/views/pwa/**: PWA manifest and service worker
+- **config/importmap.rb**: JavaScript module configuration
 
 ### Design System
 The project uses a comprehensive TailwindCSS design system with:
@@ -57,23 +60,26 @@ The project uses a comprehensive TailwindCSS design system with:
 - Consistent spacing, typography, and component patterns
 - Custom animations and transitions
 
-### Data Models
-- **Tasks**: id (primary key), title (required), description (optional), completed (boolean, default false), createdAt, updatedAt
-- **Notes**: id (primary key), title (required), content (required), createdAt, updatedAt
+### Data Models (IndexedDB)
+- **Tasks**: id (auto-increment), title (required), description (optional), completed (boolean, default false), createdAt, updatedAt
+- **Notes**: id (auto-increment), title (required), content (required), createdAt, updatedAt
+- **Export Format**: JSON with tasks, notes, exportDate, and version for backup/restore
 
 ## Current Implementation Status
 
-- **Database**: Schema defined with Drizzle ORM, better-sqlite3 driver configured
-- **UI**: Basic homepage with task and note card placeholders (buttons not yet functional)
-- **Routing**: Single route configured for homepage
-- **State Management**: TanStack React Query client set up but not yet used
-- **Styling**: TailwindCSS theme system with CSS custom properties implemented
+- **Framework**: Rails 8.0+ application fully configured with Hotwire
+- **Database**: IndexedDB with Dexie.js wrapper and complete CRUD operations
+- **UI**: Functional task and note management with Stimulus controllers
+- **PWA**: Service worker, manifest, and offline caching implemented
+- **Styling**: TailwindCSS with Rails asset pipeline integration
+- **Deployment**: GitHub Actions workflow for static site generation
 
 ## Development Notes
 
-- The app is designed to work entirely offline with local SQLite storage
-- Uses modern React patterns (React 19 with concurrent features)
-- TypeScript strict mode enabled with comprehensive linting rules
+- The app runs entirely offline with IndexedDB browser storage
+- Uses modern Rails patterns (Rails 8.0+ with Hotwire)
+- Ruby style guide enforcement with RuboCop
+- Security scanning with Brakeman
 - No test framework currently configured
-- ESLint configured for React/TypeScript with strict unused variable checking
-- Database migrations and CRUD operations not yet implemented
+- Static site generation for GitHub Pages deployment
+- Service worker provides offline functionality and app installation
