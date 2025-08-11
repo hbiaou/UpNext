@@ -35,3 +35,44 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Ignore Agent OS directories and files
+.agent-os/
+.claude/
+CLAUDE.md
+
+# Ignore Docker files (development only)
+.dockerignore
+Dockerfile
+docker-compose*.yml
+
+# Ignore Ruby version managers
+.ruby-version
+
+# Ignore development configuration
+Procfile.dev
+
+# Ignore Node.js dependencies (if using bundling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Ignore coverage reports
+/coverage/

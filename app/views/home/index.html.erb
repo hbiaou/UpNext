@@ -1,122 +1,166 @@
-<div class="min-h-screen bg-background">
-  <div class="container mx-auto p-6 max-w-6xl">
-    <!-- Header -->
-    <header class="mb-8">
-      <h1 class="text-3xl font-bold text-foreground mb-2">UpNext</h1>
-      <p class="text-muted-foreground">Your AI-powered task and note manager</p>
-    </header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Tasks Section -->
-      <div class="space-y-6" data-controller="tasks">
-        <div class="bg-card border border-border rounded-lg p-6">
-          <div class="flex items-center gap-3 mb-6">
-            <svg class="h-6 w-6 text-primary fill-current" viewBox="0 0 24 24">
-              <path d="M22,16A2,2 0 0,1 20,18H8C6.89,18 6,17.1 6,16V4C6,2.89 6.89,2 8,2H20A2,2 0 0,1 22,4V16M16,6H12V8H16V6M16,10H12V12H16V10M16,14H12V16H16V14M10,6H8V8H10V6M10,10H8V12H10V10M10,14H8V16H10V14Z"/>
-            </svg>
-            <h2 class="text-xl font-semibold">Tasks</h2>
-          </div>
-
-          <!-- Task Form -->
-          <form data-tasks-target="form" data-action="submit->tasks#create" class="space-y-4 mb-6">
-            <input
-              data-tasks-target="title"
-              type="text"
-              placeholder="Task title"
-              class="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              required
-            >
-            <textarea
-              data-tasks-target="description"
-              placeholder="Description (optional)"
-              rows="2"
-              class="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
-            ></textarea>
-            <button
-              type="submit"
-              class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 font-medium"
-            >
-              <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
-              </svg>
-              Add Task
-            </button>
-          </form>
+<div class="min-h-screen bg-background flex flex-col">
+  <!-- Top Header -->
+  <header class="border-b border-border bg-card px-6 py-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
+          <svg class="h-5 w-5 text-primary-foreground fill-current" viewBox="0 0 24 24">
+            <path d="M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,10.86 8.28,12.41 10,12.86V16H14V12.86C15.72,12.41 17,10.86 17,9A5,5 0 0,0 12,4Z"/>
+          </svg>
         </div>
+        <h1 class="text-xl font-bold text-foreground">UpNext</h1>
+      </div>
+      
+      <!-- Mobile menu toggle -->
+      <button id="mobile-menu-toggle" class="md:hidden p-2 hover:bg-accent rounded-lg">
+        <svg class="h-5 w-5 text-foreground" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
 
-        <!-- Tasks List -->
-        <div data-tasks-target="list" class="space-y-3">
-          <!-- Tasks will be rendered here by Stimulus controller -->
+  <!-- Two-Panel Layout -->
+  <main class="flex-1 grid grid-cols-1 md:grid-cols-[320px_1fr] h-[calc(100vh-73px)]">
+    
+    <!-- Left Panel: AI Chat -->
+    <aside class="border-r border-border bg-card flex flex-col" data-controller="chat">
+      <!-- Chat Header -->
+      <div class="p-4 border-b border-border">
+        <div class="flex items-center gap-3">
+          <div class="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center">
+            <svg class="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,2A2,2 0 0,1 14,4C14,5.5 13,6.19 13,7.5V9A1,1 0 0,1 12,10A1,1 0 0,1 11,9V7.5C11,6.19 10,5.5 10,4A2,2 0 0,1 12,2M21,9V7H15V9H21M9,9V7H3V9H9M11,22A1,1 0 0,1 10,21V19A1,1 0 0,1 11,18H13A1,1 0 0,1 14,19V21A1,1 0 0,1 13,22H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="font-semibold text-foreground">AI Assistant</h2>
+            <p class="text-xs text-muted-foreground">Ready to help with your tasks</p>
+          </div>
         </div>
       </div>
 
-      <!-- Notes Section -->
-      <div class="space-y-6" data-controller="notes">
-        <div class="bg-card border border-border rounded-lg p-6">
-          <div class="flex items-center gap-3 mb-6">
-            <svg class="h-6 w-6 text-primary fill-current" viewBox="0 0 24 24">
-              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+      <!-- Chat Messages -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-4" data-chat-target="messages">
+        <!-- Welcome Message -->
+        <div class="flex gap-3">
+          <div class="h-8 w-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg class="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,2A2,2 0 0,1 14,4C14,5.5 13,6.19 13,7.5V9A1,1 0 0,1 12,10A1,1 0 0,1 11,9V7.5C11,6.19 10,5.5 10,4A2,2 0 0,1 12,2M21,9V7H15V9H21M9,9V7H3V9H9M11,22A1,1 0 0,1 10,21V19A1,1 0 0,1 11,18H13A1,1 0 0,1 14,19V21A1,1 0 0,1 13,22H11M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
             </svg>
-            <h2 class="text-xl font-semibold">Notes</h2>
+          </div>
+          <div class="bg-secondary/50 rounded-lg p-3 max-w-[80%]">
+            <p class="text-sm text-foreground">Hi! I'm your AI assistant. I can help you create tasks, organize your day, and stay productive. Try saying something like "Add a task to call mom tomorrow" or "Show me what I need to do today".</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="p-4 border-t border-border">
+        <form data-chat-target="form" data-action="submit->chat#sendMessage" class="flex gap-2">
+          <input
+            data-chat-target="input"
+            type="text"
+            placeholder="Ask me to help with your tasks..."
+            class="flex-1 px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+          >
+          <button
+            type="submit"
+            class="bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Right Panel: Task Manager -->
+    <section class="flex flex-col bg-background" data-controller="tasks">
+      <!-- Task Tabs -->
+      <div class="border-b border-border bg-card">
+        <nav class="flex" data-tasks-target="tabs">
+          <button 
+            class="px-4 py-3 text-sm font-medium text-primary border-b-2 border-primary bg-primary/5"
+            data-tab="today"
+            data-action="click->tasks#switchTab"
+          >
+            Today
+          </button>
+          <button 
+            class="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground"
+            data-tab="upcoming"
+            data-action="click->tasks#switchTab"
+          >
+            Upcoming
+          </button>
+          <button 
+            class="px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground"
+            data-tab="completed"
+            data-action="click->tasks#switchTab"
+          >
+            Completed
+          </button>
+        </nav>
+      </div>
+
+      <!-- Task Content -->
+      <div class="flex-1 overflow-y-auto p-6">
+        <!-- Task Lists -->
+        <div data-tasks-target="content">
+          <!-- Today View -->
+          <div class="task-view active" data-view="today">
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-foreground mb-2">Today's Tasks</h3>
+              <p class="text-sm text-muted-foreground">Focus on what's important right now</p>
+            </div>
+            
+            <!-- Quick Add Task -->
+            <div class="mb-6 p-4 border border-dashed border-border rounded-lg hover:border-primary/50 transition-colors">
+              <form data-tasks-target="quickForm" data-action="submit->tasks#createQuick" class="flex gap-2">
+                <input
+                  data-tasks-target="quickInput"
+                  type="text"
+                  placeholder="Add a task for today..."
+                  class="flex-1 px-0 py-0 text-sm bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground"
+                >
+                <button type="submit" class="text-primary hover:text-primary/80 text-sm font-medium">
+                  Add
+                </button>
+              </form>
+            </div>
+            
+            <!-- Tasks List -->
+            <div data-tasks-target="todayList" class="space-y-2">
+              <!-- Tasks will be rendered here -->
+            </div>
           </div>
 
-          <!-- Note Form -->
-          <form data-notes-target="form" data-action="submit->notes#create" class="space-y-4 mb-6">
-            <input
-              data-notes-target="title"
-              type="text"
-              placeholder="Note title"
-              class="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              required
-            >
-            <textarea
-              data-notes-target="content"
-              placeholder="Write your note..."
-              rows="4"
-              class="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-              required
-            ></textarea>
-            <button
-              type="submit"
-              class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 font-medium"
-            >
-              <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                <path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
-              </svg>
-              Add Note
-            </button>
-          </form>
-        </div>
+          <!-- Upcoming View -->
+          <div class="task-view hidden" data-view="upcoming">
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-foreground mb-2">Upcoming Tasks</h3>
+              <p class="text-sm text-muted-foreground">Plan ahead and stay organized</p>
+            </div>
+            <div data-tasks-target="upcomingList" class="space-y-2">
+              <!-- Upcoming tasks will be rendered here -->
+            </div>
+          </div>
 
-        <!-- Notes List -->
-        <div data-notes-target="list" class="space-y-3">
-          <!-- Notes will be rendered here by Stimulus controller -->
-        </div>
-
-        <!-- Note Modal -->
-        <div 
-          data-notes-target="modal" 
-          class="hidden fixed inset-0 z-50 overflow-y-auto"
-          data-action="click->notes#hideModal"
-        >
-          <div class="flex items-center justify-center min-h-screen px-4">
-            <div class="fixed inset-0 bg-black/50"></div>
-            <div class="relative bg-card border border-border rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden" data-action="click->notes#" onclick="event.stopPropagation()">
-              <div class="flex items-center justify-between p-6 border-b border-border">
-                <h3 data-notes-target="modalTitle" class="text-lg font-semibold text-foreground"></h3>
-                <button data-action="click->notes#hideModal" class="text-muted-foreground hover:text-foreground">
-                  <svg class="h-5 w-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
-                  </svg>
-                </button>
-              </div>
-              <div data-notes-target="modalContent" class="p-6 overflow-y-auto max-h-[60vh]">
-                <!-- Note content will be inserted here -->
-              </div>
+          <!-- Completed View -->
+          <div class="task-view hidden" data-view="completed">
+            <div class="mb-6">
+              <h3 class="text-lg font-semibold text-foreground mb-2">Completed Tasks</h3>
+              <p class="text-sm text-muted-foreground">Great job on what you've accomplished!</p>
+            </div>
+            <div data-tasks-target="completedList" class="space-y-2">
+              <!-- Completed tasks will be rendered here -->
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
+  </main>
   </div>
 </div>
