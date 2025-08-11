@@ -3,12 +3,11 @@
   <header class="border-b border-border bg-card px-6 py-4">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-          <svg class="h-5 w-5 text-primary-foreground fill-current" viewBox="0 0 24 24">
-            <path d="M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,10.86 8.28,12.41 10,12.86V16H14V12.86C15.72,12.41 17,10.86 17,9A5,5 0 0,0 12,4Z"/>
-          </svg>
-        </div>
-        <h1 class="text-xl font-bold text-foreground">UpNext</h1>
+        <%= image_tag "upnext-logo.svg", 
+            alt: "UpNext Logo", 
+            class: "h-8 w-8", 
+            loading: "eager" %>
+        <h1 class="text-xl font-bold text-navy">UpNext</h1>
       </div>
       
       <div class="flex items-center gap-2">

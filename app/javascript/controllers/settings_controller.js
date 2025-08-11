@@ -223,8 +223,8 @@ export default class extends Controller {
     this.testResultTarget.textContent = message
     this.testResultTarget.className = `mt-2 text-sm ${
       type === 'success' 
-        ? 'text-green-600 dark:text-green-400' 
-        : 'text-red-600 dark:text-red-400'
+        ? 'text-success' 
+        : 'text-error'
     }`
     this.testResultTarget.style.display = 'block'
   }
@@ -243,8 +243,8 @@ export default class extends Controller {
     const messageEl = document.createElement('div')
     messageEl.className = `fixed top-4 right-4 px-4 py-2 rounded-lg text-sm font-medium z-50 ${
       type === 'success' 
-        ? 'bg-green-100 text-green-800 border border-green-200' 
-        : 'bg-red-100 text-red-800 border border-red-200'
+        ? 'bg-success/10 text-success border border-success/20' 
+        : 'bg-error/10 text-error border border-error/20'
     }`
     messageEl.textContent = message
     

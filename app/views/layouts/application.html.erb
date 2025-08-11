@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0ea5e9">
+    <meta name="theme-color" content="#4F83F1">
+    <meta name="msapplication-TileColor" content="#133C55">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -15,9 +16,13 @@
     <%# Enable PWA manifest for installable apps %>
     <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <%# Favicon configuration for all browsers and devices %>
+    <%= favicon_link_tag "favicon.ico", rel: "icon", type: "image/x-icon" %>
+    <%= favicon_link_tag "favicon.png", rel: "icon", type: "image/png", sizes: "32x32" %>
+    <%= favicon_link_tag "upnext-logo@192.png", rel: "icon", type: "image/png", sizes: "192x192" %>
+    <%= favicon_link_tag "upnext-logo.svg", rel: "icon", type: "image/svg+xml" %>
+    <%= favicon_link_tag "apple-touch-icon.png", rel: "apple-touch-icon", sizes: "180x180" %>
+    <%= favicon_link_tag "apple-touch-icon.png", rel: "apple-touch-icon-precomposed", sizes: "180x180" %>
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
