@@ -123,7 +123,14 @@ GEM
     marcel (1.0.4)
     mini_mime (1.1.5)
     minitest (5.25.5)
+    mozaic (2.0.1)
+      activesupport (>= 5.0)
+      nestive-rails (~> 1.0)
+      railties (>= 5.0)
     msgpack (1.8.0)
+    nestive-rails (1.0.2)
+      actionview (>= 5.0)
+      railties (>= 5.0)
     net-imap (0.5.9)
       date
       net-protocol
@@ -155,7 +162,8 @@ GEM
       stringio
     puma (6.6.1)
       nio4r (~> 2.0)
-    pwa (1.2.0)
+    pwa (4.0.6)
+      mozaic (~> 2.0)
       railties (>= 5.0)
     racc (1.8.1)
     rack (3.2.0)
@@ -278,7 +286,7 @@ DEPENDENCIES
   jbuilder
   propshaft
   puma (>= 5.0)
-  pwa (~> 1.0)
+  pwa (~> 4.0)
   rails (~> 8.0.2)
   rubocop-rails-omakase
   stimulus-rails
