@@ -10,3 +10,51 @@
  */
 
 @import "../builds/tailwind.css";
+
+/* UpNext Brand Theme System */
+:root {
+  /* Background & Surface Colors */
+  --color-bg: #F7F8FA;           /* App background/canvas */
+  --color-surface: #FFFFFF;       /* Cards, panels */
+  --color-border: #E6E9EE;        /* Borders, dividers */
+  
+  /* Text Colors */
+  --color-text: #0B1220;          /* Primary text */
+  --color-muted: #5B6474;         /* Secondary text */
+  
+  /* Brand Colors */
+  --brand-navy: #133C55;          /* Navigation, heading accents */
+  --brand-blue: #4F83F1;          /* Primary actions, chat bubbles */
+  --brand-green: #31B67A;         /* Success, checkmarks */
+  
+  /* State Colors */
+  --state-info: #4F83F1;          /* Information states */
+  --state-success: #31B67A;       /* Success states */
+  --state-warn: #F6C44F;          /* Warning states */
+  --state-error: #E5484D;         /* Error states */
+  
+  /* Semantic Color Mappings for TailwindCSS */
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-card: var(--color-surface);
+  --color-card-foreground: var(--color-text);
+  --color-primary: var(--brand-blue);
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: var(--color-border);
+  --color-secondary-foreground: var(--color-text);
+  --color-muted: var(--color-border);
+  --color-muted-foreground: var(--color-muted);
+  --color-accent: var(--brand-navy);
+  --color-accent-foreground: #FFFFFF;
+  --color-destructive: var(--state-error);
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: var(--color-border);
+  --color-input: var(--color-surface);
+  --color-ring: var(--brand-blue);
+}
+
+/* Theme Application */
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
