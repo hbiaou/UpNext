@@ -9,6 +9,14 @@ export class UpNextDatabase extends Dexie {
       tasks: '++id, title, description, completed, createdAt, updatedAt',
       notes: '++id, title, content, createdAt, updatedAt'
     })
+
+    // Version 2: Add conversation and user settings
+    this.version(2).stores({
+      tasks: '++id, title, description, completed, createdAt, updatedAt',
+      notes: '++id, title, content, createdAt, updatedAt',
+      conversations: '++id, role, content, timestamp, taskIds, messageId',
+      userSettings: '++id, key, value, createdAt, updatedAt'
+    })
   }
 }
 
@@ -129,6 +137,114 @@ export const DataService = {
           title: note.title,
           content: note.content
         })
+      }
+    }
+  }
+}
+
+// Conversation operations
+export const ConversationService = {
+  async getAll() {
+    return await db.conversations.orderBy('timestamp').toArray()
+  },
+
+  async create(messageData) {
+    const now = new Date()
+    const message = {
+      ...messageData,
+      timestamp: now,
+      messageId: this.generateMessageId()
+    }
+    const id = await db.conversations.add(message)
+    return { ...message, id }
+  },
+
+  async getRecent(limit = 50) {
+    return await db.conversations
+      .orderBy('timestamp')
+      .reverse()
+      .limit(limit)
+      .toArray()
+  },
+
+  async getByTaskId(taskId) {
+    return await db.conversations
+      .where('taskIds')
+      .equals(taskId)
+      .toArray()
+  },
+
+  async delete(id) {
+    await db.conversations.delete(id)
+  },
+
+  async clear() {
+    await db.conversations.clear()
+  },
+
+  async getContext(limit = 10) {
+    const messages = await this.getRecent(limit)
+    return messages.reverse() // Return in chronological order
+  },
+
+  generateMessageId() {
+    return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+}
+
+// User settings operations
+export const SettingsService = {
+  async get(key, defaultValue = null) {
+    const setting = await db.userSettings.where('key').equals(key).first()
+    return setting ? setting.value : defaultValue
+  },
+
+  async set(key, value) {
+    const now = new Date()
+    const existing = await db.userSettings.where('key').equals(key).first()
+    
+    if (existing) {
+      await db.userSettings.update(existing.id, {
+        value: value,
+        updatedAt: now
+      })
+    } else {
+      await db.userSettings.add({
+        key: key,
+        value: value,
+        createdAt: now,
+        updatedAt: now
+      })
+    }
+  },
+
+  async remove(key) {
+    await db.userSettings.where('key').equals(key).delete()
+  },
+
+  async getAll() {
+    const settings = await db.userSettings.toArray()
+    const result = {}
+    settings.forEach(setting => {
+      result[setting.key] = setting.value
+    })
+    return result
+  },
+
+  async clear() {
+    await db.userSettings.clear()
+  },
+
+  async export() {
+    return await this.getAll()
+  },
+
+  async import(settings, overwrite = false) {
+    const entries = Object.entries(settings)
+    
+    for (const [key, value] of entries) {
+      if (overwrite || !(await this.get(key))) {
+        await this.set(key, value)
       }
     }
   }

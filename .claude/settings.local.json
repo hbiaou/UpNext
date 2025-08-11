@@ -5,7 +5,12 @@
       "Bash(npm install:*)",
       "Bash(git add:*)",
       "Bash(mkdir:*)",
-      "Bash(dir /a C:1GitReposUpNext.kamal)"
+      "Bash(dir /a C:1GitReposUpNext.kamal)",
+      "mcp__playwright__browser_navigate",
+      "Bash(git push:*)",
+      "Bash(rails test)",
+      "Bash(rubocop:*)",
+      "Bash(rails test:*)"
     ],
     "deny": []
   }
