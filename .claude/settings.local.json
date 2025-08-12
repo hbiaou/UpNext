@@ -10,7 +10,13 @@
       "Bash(git push:*)",
       "Bash(rails test)",
       "Bash(rubocop:*)",
-      "Bash(rails test:*)"
+      "Bash(rails test:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "Bash(taskkill:*)",
+      "Bash(bin/rails:*)",
+      "Bash(rails:*)",
+      "Bash(bin/dev:*)"
     ],
     "deny": []
   }

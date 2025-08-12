@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import { NoteService } from "../database"
+import { NoteService } from "database"
 
 export default class extends Controller {
   static targets = ["list", "form", "title", "content", "modal", "modalTitle", "modalContent"]

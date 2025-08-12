@@ -17,6 +17,43 @@ export class UpNextDatabase extends Dexie {
       conversations: '++id, role, content, timestamp, taskIds, messageId',
       userSettings: '++id, key, value, createdAt, updatedAt'
     })
+
+    // Version 3: Enhanced task management with categories, priorities, and due dates
+    this.version(3).stores({
+      tasks: '++id, title, description, completed, category_id, priority, due_date, subtasks, createdAt, updatedAt',
+      notes: '++id, title, content, createdAt, updatedAt',
+      conversations: '++id, role, content, timestamp, taskIds, messageId',
+      userSettings: '++id, key, value, createdAt, updatedAt',
+      categories: '++id, name, color, icon, createdAt, updatedAt'
+    }).upgrade(async trans => {
+      // Migration logic for existing tasks
+      const tasks = await trans.table('tasks').toArray()
+      for (const task of tasks) {
+        await trans.table('tasks').update(task.id, {
+          category_id: null,
+          priority: 'medium',
+          due_date: null,
+          subtasks: []
+        })
+      }
+
+      // Create default categories
+      const defaultCategories = [
+        { name: 'Personal', color: '#31B67A', icon: 'user' },
+        { name: 'Work', color: '#4F83F1', icon: 'briefcase' },
+        { name: 'Important', color: '#F97316', icon: 'star' },
+        { name: 'General', color: '#6B7280', icon: 'inbox' }
+      ]
+
+      const now = new Date()
+      for (const category of defaultCategories) {
+        await trans.table('categories').add({
+          ...category,
+          createdAt: now,
+          updatedAt: now
+        })
+      }
+    })
   }
 }
 
@@ -28,11 +65,50 @@ export const TaskService = {
   async getAll() {
     return await db.tasks.orderBy('createdAt').reverse().toArray()
   },
+
+  async getAllByCategory(categoryId) {
+    if (categoryId) {
+      return await db.tasks.where('category_id').equals(categoryId).orderBy('createdAt').reverse().toArray()
+    }
+    return await db.tasks.where('category_id').equals(null).orderBy('createdAt').reverse().toArray()
+  },
+
+  async getAllByPriority(priority) {
+    return await db.tasks.where('priority').equals(priority).orderBy('createdAt').reverse().toArray()
+  },
+
+  async getOverdue() {
+    const now = new Date()
+    now.setHours(23, 59, 59, 999) // End of today
+    return await db.tasks
+      .where('due_date')
+      .below(now)
+      .and(task => !task.completed)
+      .orderBy('due_date')
+      .toArray()
+  },
+
+  async getDueToday() {
+    const today = new Date()
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999)
+    
+    return await db.tasks
+      .where('due_date')
+      .between(startOfDay, endOfDay, true, true)
+      .orderBy('due_date')
+      .toArray()
+  },
   
   async create(taskData) {
     const now = new Date()
     const task = {
-      ...taskData,
+      title: taskData.title,
+      description: taskData.description || '',
+      category_id: taskData.category_id || null,
+      priority: taskData.priority || 'medium',
+      due_date: taskData.due_date || null,
+      subtasks: taskData.subtasks || [],
       completed: false,
       createdAt: now,
       updatedAt: now
@@ -53,12 +129,95 @@ export const TaskService = {
   async delete(id) {
     await db.tasks.delete(id)
   },
+
+  async get(id) {
+    return await db.tasks.get(id)
+  },
   
   async toggleComplete(id) {
     const task = await db.tasks.get(id)
     if (task) {
       return await this.update(id, { completed: !task.completed })
     }
+  },
+
+  async addSubtask(taskId, subtaskText) {
+    const task = await db.tasks.get(taskId)
+    if (task) {
+      const subtasks = task.subtasks || []
+      subtasks.push({
+        id: Date.now(),
+        text: subtaskText,
+        completed: false
+      })
+      return await this.update(taskId, { subtasks })
+    }
+  },
+
+  async toggleSubtask(taskId, subtaskId) {
+    const task = await db.tasks.get(taskId)
+    if (task && task.subtasks) {
+      const subtasks = task.subtasks.map(sub => 
+        sub.id === subtaskId ? { ...sub, completed: !sub.completed } : sub
+      )
+      return await this.update(taskId, { subtasks })
+    }
+  },
+
+  async deleteSubtask(taskId, subtaskId) {
+    const task = await db.tasks.get(taskId)
+    if (task && task.subtasks) {
+      const subtasks = task.subtasks.filter(sub => sub.id !== subtaskId)
+      return await this.update(taskId, { subtasks })
+    }
+  }
+}
+
+// Category operations
+export const CategoryService = {
+  async getAll() {
+    return await db.categories.orderBy('name').toArray()
+  },
+
+  async create(categoryData) {
+    const now = new Date()
+    const category = {
+      name: categoryData.name,
+      color: categoryData.color || '#6B7280',
+      icon: categoryData.icon || 'folder',
+      createdAt: now,
+      updatedAt: now
+    }
+    const id = await db.categories.add(category)
+    return { ...category, id }
+  },
+
+  async update(id, updates) {
+    const updatedCategory = {
+      ...updates,
+      updatedAt: new Date()
+    }
+    await db.categories.update(id, updatedCategory)
+    return await db.categories.get(id)
+  },
+
+  async delete(id) {
+    // First, update all tasks with this category to have no category
+    const tasksWithCategory = await db.tasks.where('category_id').equals(id).toArray()
+    for (const task of tasksWithCategory) {
+      await db.tasks.update(task.id, { category_id: null })
+    }
+    
+    // Then delete the category
+    await db.categories.delete(id)
+  },
+
+  async get(id) {
+    return await db.categories.get(id)
+  },
+
+  async getByName(name) {
+    return await db.categories.where('name').equals(name).first()
   }
 }
 
@@ -102,30 +261,54 @@ export const DataService = {
   async exportData() {
     const tasks = await TaskService.getAll()
     const notes = await NoteService.getAll()
+    const categories = await CategoryService.getAll()
+    const settings = await SettingsService.getAll()
     return {
       tasks,
       notes,
+      categories,
+      settings,
       exportDate: new Date().toISOString(),
-      version: 1
+      version: 3
     }
   },
   
-  async importData(data) {
-    if (!data.tasks && !data.notes) {
+  async importData(data, options = {}) {
+    const { clearExisting = false } = options
+    
+    if (!data.tasks && !data.notes && !data.categories) {
       throw new Error('Invalid data format')
     }
     
-    // Clear existing data (optional - add confirmation in UI)
-    // await db.tasks.clear()
-    // await db.notes.clear()
+    // Clear existing data if requested
+    if (clearExisting) {
+      await db.tasks.clear()
+      await db.notes.clear()
+      await db.categories.clear()
+    }
+    
+    // Import categories first (for foreign key references)
+    if (data.categories && data.categories.length > 0) {
+      for (const category of data.categories) {
+        await CategoryService.create({
+          name: category.name,
+          color: category.color,
+          icon: category.icon
+        })
+      }
+    }
     
     // Import tasks
     if (data.tasks && data.tasks.length > 0) {
       for (const task of data.tasks) {
         await TaskService.create({
           title: task.title,
-          description: task.description,
-          completed: task.completed
+          description: task.description || '',
+          category_id: task.category_id || null,
+          priority: task.priority || 'medium',
+          due_date: task.due_date || null,
+          subtasks: task.subtasks || [],
+          completed: task.completed || false
         })
       }
     }
@@ -138,6 +321,11 @@ export const DataService = {
           content: note.content
         })
       }
+    }
+
+    // Import settings
+    if (data.settings) {
+      await SettingsService.import(data.settings, clearExisting)
     }
   }
 }

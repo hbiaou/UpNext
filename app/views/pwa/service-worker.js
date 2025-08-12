@@ -5,18 +5,24 @@ const OFFLINE_URL = '/'
 const FILES_TO_CACHE = [
   '/',
   '/manifest',
-  '/assets/tailwind.css',
-  '/assets/application.js',
-  '/icon.png',
-  '/icon.svg'
+  '/favicon.ico',
+  '/upnext-logo.svg'
 ]
 
 // Install event - cache core files
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
+    caches.open(CACHE_NAME).then(async (cache) => {
       console.log('Caching core files')
-      return cache.addAll(FILES_TO_CACHE)
+      // Cache files individually with error handling
+      const cachePromises = FILES_TO_CACHE.map(async (url) => {
+        try {
+          await cache.add(url)
+        } catch (error) {
+          console.warn(`Failed to cache ${url}:`, error)
+        }
+      })
+      await Promise.all(cachePromises)
     })
   )
   self.skipWaiting()
