@@ -16,7 +16,16 @@
       "Bash(taskkill:*)",
       "Bash(bin/rails:*)",
       "Bash(rails:*)",
-      "Bash(bin/dev:*)"
+      "Bash(bin/dev:*)",
+      "mcp__github__list_notifications",
+      "mcp__github__list_workflow_runs",
+      "mcp__github__get_job_logs",
+      "Bash(bin/rubocop:*)",
+      "Bash(bin/brakeman --no-pager)",
+      "Bash(bin/importmap:*)",
+      "Bash(set RAILS_ENV=production)",
+      "Bash(bundle exec rails generate:static_site:*)",
+      "Bash(set SECRET_KEY_BASE=dummy_secret_for_precompile)"
     ],
     "deny": []
   }

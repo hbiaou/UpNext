@@ -24,19 +24,24 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: 3.2
+        ruby-version: .ruby-version
         bundler-cache: true
     
     - name: Install dependencies
       run: bundle install
     
     - name: Build assets
+      env:
+        RAILS_ENV: production
+        SECRET_KEY_BASE: dummy_secret_for_precompile
       run: |
         bundle exec rails assets:precompile
         bundle exec rails generate:static_site
     
     - name: Setup Pages
-      uses: actions/configure-pages@v4
+      uses: actions/configure-pages@v5
+      with:
+        enablement: true
     
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
