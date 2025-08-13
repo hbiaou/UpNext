@@ -9,8 +9,6 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
-@import "../builds/tailwind.css";
-
 /* UpNext Brand Theme System */
 :root {
   /* Background & Surface Colors */
@@ -57,4 +55,52 @@
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
+}
+
+/* Priority Badge Colors */
+.priority-high {
+  background-color: #FEE2E2;
+  color: #DC2626;
+}
+
+.priority-medium {
+  background-color: #FEF3C7;
+  color: #D97706;
+}
+
+.priority-low {
+  background-color: #D1FAE5;
+  color: #059669;
+}
+
+/* Modal backdrop animation */
+.modal-backdrop {
+  backdrop-filter: blur(2px);
+}
+
+/* Priority indicator styles */
+.priority-indicator {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+}
+
+/* Brand color utilities */
+.text-navy {
+  color: var(--brand-navy);
+}
+
+.bg-navy {
+  background-color: var(--brand-navy);
+}
+
+.text-brand-blue {
+  color: var(--brand-blue);
+}
+
+.bg-brand-blue {
+  background-color: var(--brand-blue);
 }

@@ -9,6 +9,16 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Tasks CRUD routes
+  resources :tasks, only: [ :index, :show, :create, :update, :destroy ] do
+    member do
+      patch :toggle_complete
+    end
+  end
+
+  # Categories routes
+  resources :categories, only: [ :index, :create, :update, :destroy ]
+
   # Defines the root path route ("/")
   root "home#index"
 end

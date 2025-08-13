@@ -76,3 +76,7 @@ Thumbs.db
 
 # Ignore coverage reports
 /coverage/
+
+# Ignore server logs
+server.log
+*.log

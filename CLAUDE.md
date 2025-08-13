@@ -87,3 +87,12 @@ The project uses a comprehensive TailwindCSS design system with:
 - Static site generation for GitHub Pages deployment
 - Service worker provides offline functionality and app installation
 - Always check the ROADMAP at c:\1GitRepos\UpNext\.agent-os\product\roadmap.md before creating spec and also update the ROADMAP after completing new specs
+- Remember to always kill the development server if it is running, before restarting it.
+Here are the commands to kill the existing server and restart it on port 3000:
+  Kill the existing server:
+  netstat -ano | findstr :3000
+  This will show you the PID (process ID) of the process using port 3000. Then use that PID in:
+  taskkill /PID <PID_NUMBER>
+
+  Restart the server:
+  rails server

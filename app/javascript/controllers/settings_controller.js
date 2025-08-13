@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
-import { EncryptionService } from "../services/encryption-service"
-import { AIProviderService } from "../services/ai-provider-service"
+import { EncryptionService } from "services/encryption-service"
+import { AIProviderService } from "services/ai-provider-service"
 
 export default class extends Controller {
   static targets = ["modal", "provider", "apiKey", "model", "customUrl", "testResult", "testButton"]
@@ -8,14 +8,20 @@ export default class extends Controller {
   connect() {
     this.encryptionService = new EncryptionService()
     this.aiProviderService = new AIProviderService(this.encryptionService)
-    this.loadCurrentSettings()
+    
+    // Only load settings if we have the required targets
+    if (this.hasProviderTarget && this.hasModelTarget) {
+      this.loadCurrentSettings()
+    }
   }
 
   // Open settings modal
   open() {
-    this.modalTarget.classList.remove('hidden')
-    this.modalTarget.classList.add('flex')
-    document.body.style.overflow = 'hidden'
+    if (this.hasModalTarget) {
+      this.modalTarget.classList.remove('hidden')
+      this.modalTarget.classList.add('flex')
+      document.body.style.overflow = 'hidden'
+    }
   }
 
   // Close settings modal
@@ -44,21 +50,21 @@ export default class extends Controller {
       
       // Load saved model
       const savedModel = localStorage.getItem('upnext_ai_model')
-      if (savedModel && this.hasTarget('model')) {
+      if (savedModel && this.hasModelTarget) {
         this.modelTarget.value = savedModel
       }
 
       // Load custom URL if custom provider
       if (currentProvider === 'custom') {
         const customSettings = await this.aiProviderService.getCustomSettings()
-        if (customSettings && customSettings.baseUrl && this.hasTarget('customUrl')) {
+        if (customSettings && customSettings.baseUrl && this.hasCustomUrlTarget) {
           this.customUrlTarget.value = customSettings.baseUrl
         }
       }
 
       // Check if API key exists
       const hasApiKey = await this.aiProviderService.getApiKey(currentProvider)
-      if (hasApiKey && this.hasTarget('apiKey')) {
+      if (hasApiKey && this.hasApiKeyTarget) {
         this.apiKeyTarget.placeholder = "API key configured ✓"
       }
     } catch (error) {
@@ -78,7 +84,7 @@ export default class extends Controller {
     
     // Update API key placeholder
     const hasApiKey = await this.aiProviderService.getApiKey(provider)
-    if (this.hasTarget('apiKey')) {
+    if (this.hasApiKeyTarget) {
       this.apiKeyTarget.placeholder = hasApiKey ? "API key configured ✓" : `Enter your ${this.getProviderName(provider)} API key`
       this.apiKeyTarget.value = ""
     }
@@ -89,7 +95,7 @@ export default class extends Controller {
 
   // Update model dropdown based on provider
   updateModelOptions() {
-    if (!this.hasTarget('model')) return
+    if (!this.hasModelTarget) return
 
     const provider = this.providerTarget.value
     const providers = this.aiProviderService.getProviders()
@@ -135,7 +141,7 @@ export default class extends Controller {
 
   // Toggle custom URL field visibility
   toggleCustomUrlField(show) {
-    if (!this.hasTarget('customUrl')) return
+    if (!this.hasCustomUrlTarget) return
 
     const customUrlContainer = this.customUrlTarget.closest('.form-group')
     if (customUrlContainer) {
@@ -147,9 +153,9 @@ export default class extends Controller {
   async save() {
     try {
       const provider = this.providerTarget.value
-      const apiKey = this.hasTarget('apiKey') ? this.apiKeyTarget.value.trim() : ''
-      const model = this.hasTarget('model') ? this.modelTarget.value : ''
-      const customUrl = this.hasTarget('customUrl') ? this.customUrlTarget.value.trim() : ''
+      const apiKey = this.hasApiKeyTarget ? this.apiKeyTarget.value.trim() : ''
+      const model = this.hasModelTarget ? this.modelTarget.value : ''
+      const customUrl = this.hasCustomUrlTarget ? this.customUrlTarget.value.trim() : ''
 
       // Save provider and model
       localStorage.setItem('upnext_ai_provider', provider)
@@ -170,7 +176,7 @@ export default class extends Controller {
       this.showMessage('Settings saved successfully!', 'success')
       
       // Clear API key input for security
-      if (this.hasTarget('apiKey')) {
+      if (this.hasApiKeyTarget) {
         this.apiKeyTarget.value = ''
         this.apiKeyTarget.placeholder = "API key configured ✓"
       }
@@ -183,7 +189,7 @@ export default class extends Controller {
 
   // Test API connection
   async testConnection() {
-    if (!this.hasTarget('testButton') || !this.hasTarget('testResult')) return
+    if (!this.hasTestButtonTarget || !this.hasTestResultTarget) return
 
     try {
       this.testButtonTarget.disabled = true
@@ -191,7 +197,7 @@ export default class extends Controller {
       this.clearTestResults()
 
       const provider = this.providerTarget.value
-      const apiKey = this.hasTarget('apiKey') ? this.apiKeyTarget.value.trim() : ''
+      const apiKey = this.hasApiKeyTarget ? this.apiKeyTarget.value.trim() : ''
 
       // Save API key temporarily for testing if provided
       if (apiKey) {
@@ -218,7 +224,7 @@ export default class extends Controller {
 
   // Show test result
   showTestResult(message, type) {
-    if (!this.hasTarget('testResult')) return
+    if (!this.hasTestResultTarget) return
 
     this.testResultTarget.textContent = message
     this.testResultTarget.className = `mt-2 text-sm ${
@@ -231,7 +237,7 @@ export default class extends Controller {
 
   // Clear test results
   clearTestResults() {
-    if (this.hasTarget('testResult')) {
+    if (this.hasTestResultTarget) {
       this.testResultTarget.style.display = 'none'
       this.testResultTarget.textContent = ''
     }
