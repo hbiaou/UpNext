@@ -29,7 +29,7 @@ namespace :generate do
     MAX_PORT_TRIES.times do
       begin
         # Try to bind to the port to see if it's available
-        server = TCPServer.new('localhost', port)
+        server = TCPServer.new("localhost", port)
         server.close
         break
       rescue Errno::EADDRINUSE
@@ -81,7 +81,7 @@ namespace :generate do
 
           FileUtils.mkdir_p(File.dirname(file_path))
           # Force encoding to UTF-8 to handle potential encoding issues
-          content = response.body.force_encoding('UTF-8')
+          content = response.body.force_encoding("UTF-8")
           File.write(file_path, content)
           puts "Generated: #{file_path}"
         else
