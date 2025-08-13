@@ -26,7 +26,15 @@
       "Bash(set RAILS_ENV=production)",
       "Bash(bundle exec rails generate:static_site:*)",
       "Bash(set SECRET_KEY_BASE=dummy_secret_for_precompile)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "mcp__github__list_workflows",
+      "mcp__github__list_pull_requests",
+      "mcp__fetch__fetch",
+      "mcp__github__get_pull_request",
+      "mcp__github__get_pull_request",
+      "mcp__github__get_pull_request",
+      "Bash(cat:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }
