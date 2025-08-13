@@ -202,11 +202,8 @@ export const CategoryService = {
   },
 
   async delete(id) {
-    // First, update all tasks with this category to have no category
-    const tasksWithCategory = await db.tasks.where('category_id').equals(id).toArray()
-    for (const task of tasksWithCategory) {
-      await db.tasks.update(task.id, { category_id: null })
-    }
+    // First, update all tasks with this category to have no category (bulk operation)
+    await db.tasks.where('category_id').equals(id).modify({ category_id: null })
     
     // Then delete the category
     await db.categories.delete(id)

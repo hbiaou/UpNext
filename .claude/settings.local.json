@@ -25,7 +25,8 @@
       "Bash(bin/importmap:*)",
       "Bash(set RAILS_ENV=production)",
       "Bash(bundle exec rails generate:static_site:*)",
-      "Bash(set SECRET_KEY_BASE=dummy_secret_for_precompile)"
+      "Bash(set SECRET_KEY_BASE=dummy_secret_for_precompile)",
+      "Bash(git fetch:*)"
     ],
     "deny": []
   }

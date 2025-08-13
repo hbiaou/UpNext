@@ -97,6 +97,7 @@ export default class extends Controller {
       this.renderTasks(completedTasks, 'completedList')
     } catch (error) {
       console.error('Error loading tasks:', error)
+      this.showError('Failed to load tasks. Please refresh the page.')
     }
   }
 
@@ -483,9 +484,25 @@ export default class extends Controller {
     event.preventDefault()
     
     const formData = new FormData(event.target)
+    const name = formData.get('name')
+    const color = formData.get('color')
+
+    // Validate color format (hex color)
+    const colorRegex = /^#[0-9A-F]{6}$/i
+    if (color && !colorRegex.test(color)) {
+      this.showError('Invalid color format. Please use a valid hex color (e.g., #FF0000)')
+      return
+    }
+
+    // Validate name
+    if (!name || name.trim().length === 0) {
+      this.showError('Category name is required')
+      return
+    }
+
     const categoryData = {
-      name: formData.get('name'),
-      color: formData.get('color'),
+      name: name.trim(),
+      color: color || '#3B82F6', // Default blue color if none provided
       icon: 'folder'
     }
 
@@ -493,8 +510,10 @@ export default class extends Controller {
       await CategoryService.create(categoryData)
       event.target.reset()
       await this.loadCategories()
+      this.showSuccess('Category created successfully')
     } catch (error) {
       console.error('Error creating category:', error)
+      this.showError('Failed to create category. Please try again.')
     }
   }
 
@@ -555,5 +574,59 @@ export default class extends Controller {
     const div = document.createElement('div')
     div.textContent = text
     return div.innerHTML
+  }
+
+  // User feedback methods
+  showError(message) {
+    this.showNotification(message, 'error')
+  }
+
+  showSuccess(message) {
+    this.showNotification(message, 'success')
+  }
+
+  showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div')
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg max-w-sm transition-all duration-300 transform translate-x-full`
+    
+    // Style based on type
+    if (type === 'error') {
+      notification.className += ' bg-destructive text-destructive-foreground'
+    } else if (type === 'success') {
+      notification.className += ' bg-green-500 text-white'
+    } else {
+      notification.className += ' bg-primary text-primary-foreground'
+    }
+
+    notification.innerHTML = `
+      <div class="flex items-center gap-2">
+        ${type === 'error' ? 
+          '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>' :
+          type === 'success' ?
+          '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>' :
+          '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>'
+        }
+        <span>${this.escapeHtml(message)}</span>
+      </div>
+    `
+
+    // Add to document
+    document.body.appendChild(notification)
+
+    // Trigger slide-in animation
+    setTimeout(() => {
+      notification.classList.remove('translate-x-full')
+    }, 10)
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      notification.classList.add('translate-x-full')
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification)
+        }
+      }, 300)
+    }, 5000)
   }
 }

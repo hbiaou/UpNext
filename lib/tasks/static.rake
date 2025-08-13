@@ -1,6 +1,12 @@
 namespace :generate do
   desc "Generate static site for GitHub Pages"
   task static_site: :environment do
+    # Constants for configuration
+    INITIAL_PORT = 3001
+    MAX_PORT_TRIES = 10
+    SERVER_STARTUP_TIMEOUT = 30
+    SERVER_CHECK_INTERVAL = 1
+
     puts "Generating static site..."
 
     # Ensure we're in production mode
@@ -19,8 +25,8 @@ namespace :generate do
     require "socket"
 
     # Find available port (Windows and Linux compatible)
-    port = 3001
-    10.times do
+    port = INITIAL_PORT
+    MAX_PORT_TRIES.times do
       begin
         # Try to bind to the port to see if it's available
         server = TCPServer.new('localhost', port)
@@ -34,14 +40,15 @@ namespace :generate do
     puts "Using port #{port} for Rails server"
 
     # Start Rails server in background with more time and better error handling
-    server_pid = spawn("bundle exec rails server -p #{port} -e production",
-                      out: "server.log", err: "server.log")
+    # Use Process.spawn with array form for security (prevents shell injection)
+    server_pid = Process.spawn({}, "bundle", "exec", "rails", "server", "-p", port.to_s, "-e", "production",
+                              out: "server.log", err: "server.log")
 
     # Wait for server to start with better checking
     server_ready = false
-    30.times do |i|
+    SERVER_STARTUP_TIMEOUT.times do |i|
       begin
-        sleep 1
+        sleep SERVER_CHECK_INTERVAL
         uri = URI("http://localhost:#{port}/")
         response = Net::HTTP.get_response(uri)
         if response.code
@@ -50,7 +57,7 @@ namespace :generate do
           break
         end
       rescue
-        puts "Waiting for server to start... (#{i + 1}/30)"
+        puts "Waiting for server to start... (#{i + 1}/#{SERVER_STARTUP_TIMEOUT})"
       end
     end
 
